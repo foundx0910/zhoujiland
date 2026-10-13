@@ -188,7 +188,7 @@ export default function Layout() {
         <IdentityBar />
       </header>
 
-      {user?.default_pw && (
+      {user?.role === 'admin' && user?.default_pw && (
         <div className="identity-bar warn-bar">
           <span>⚠️ 你正在使用默认管理员密码，公网上线前请务必修改。</span>
           <Link className="tiny-link" to="/me">

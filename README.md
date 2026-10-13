@@ -214,6 +214,24 @@ Workers 免费版**每次请求只有 10ms CPU**，而密码哈希是纯 CPU 开
 
 ---
 
+## 🔍 验收测试（改完跑一遍）
+
+先把本地服务跑起来（`npm start`），然后：
+
+```bash
+npm run verify            # 全套：核心 + 新功能
+npm run verify:core       # 板块 / 帖子 / 楼层 / 楼中楼 / 权限 / 搜索 / 管理   （55 项）
+npm run verify:features   # 个人中心 / 消息通知 / 版主 / 举报 / 公告          （59 项）
+```
+
+也可以直接对着线上跑（**会往目标站点写测试数据，线上慎用**）：
+
+```bash
+node scripts/verify-features.mjs https://zhoujiland.dpdns.org
+```
+
+脚本就在仓库里（`scripts/verify-*.mjs`），跟着代码走，不会再丢。
+
 ## 五、上线前的安全清单
 
 1. **改掉 `admin` 的默认密码**（最高优先级，README 里写着这个密码，等于公开）。

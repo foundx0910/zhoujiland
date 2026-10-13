@@ -156,5 +156,28 @@ await backdate(Number(t3.threadId ?? t3), 40);
 
 console.log('[demo] 演示数据已写入。');
 console.log('[demo] 演示账号：小明 / 阿强 / 李华，密码均为 demo1234');
+// 演示公告：方便本地看首页弹窗效果
+try {
+  const has = await db.first('SELECT COUNT(*) AS n FROM announcements');
+  if (!has?.n) {
+    await db.run(
+      `INSERT INTO announcements (title, content, level, link_url, link_text, active, sort, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 1, 10, ?, ?, ?)`,
+      [
+        '欢迎来到本站（这是一条演示公告）',
+        '这条公告是**弹窗**形式：进站时会跳出来，点右下角「知道了」就关掉，之后不再打扰你。\n\n- 站长可以在「管理后台 → 公告」里发布、编辑、下架或删除\n- 想改成顶部横幅？把 `web/src/site.js` 里的 `announce.style` 改成 `banner`',
+        'important',
+        '',
+        '',
+        'admin',
+        new Date().toISOString(),
+        new Date().toISOString(),
+      ]
+    );
+  }
+} catch (e) {
+  console.warn('（跳过演示公告：' + e.message + '）');
+}
+
 console.log('[demo] 管理员账号：admin / admin123（请尽快修改密码）');
 await db.close();

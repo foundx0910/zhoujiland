@@ -22,7 +22,10 @@
     "cf:deploy": "npm run build && wrangler deploy",
     "cf:tail": "wrangler tail",
     "export-db": "node scripts/export-d1.mjs",
-    "export-db:import": "node scripts/export-d1.mjs --import"
+    "export-db:import": "node scripts/export-d1.mjs --import",
+    "verify": "node scripts/verify-core.mjs && node scripts/verify-features.mjs",
+    "verify:core": "node scripts/verify-core.mjs",
+    "verify:features": "node scripts/verify-features.mjs"
   },
   "dependencies": {
     "dompurify": "^3.2.7",
