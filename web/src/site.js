@@ -81,6 +81,10 @@ export const site = {
 
   /* ------------------------------ 公告 ------------------------------ */
   announce: {
+    /* 公告怎么显示：'modal' = 进站弹窗（默认）、'banner' = 顶部横幅、'both' = 两个都要 */
+    style: 'modal',
+    modalTitle: '公告',
+    close: '知道了',
     navLabel: '公告',
     all: '查看全部公告 →',
     expand: '展开',

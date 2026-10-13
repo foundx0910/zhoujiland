@@ -5,6 +5,7 @@ import { site } from '../site.js';
 import Avatar from './Avatar.jsx';
 import { ENTERED_KEY } from '../pages/Welcome.jsx';
 import AnnouncementBanner from './AnnouncementBanner.jsx';
+import AnnouncementModal from './AnnouncementModal.jsx';
 
 function IdentityBar() {
   const { actor, setGuestName, notify } = useAuth();
@@ -202,7 +203,8 @@ export default function Layout() {
         </div>
       )}
 
-      <AnnouncementBanner />
+      {site.announce.style !== 'modal' && <AnnouncementBanner />}
+      {site.announce.style !== 'banner' && <AnnouncementModal />}
 
       <main className="main">
         <Outlet />
