@@ -30,23 +30,29 @@ function markClosed(list) {
  */
 export default function AnnouncementModal() {
   const [items, setItems] = useState([]);
+  const [preview, setPreview] = useState(false);
 
-  useEffect(() => {
-    let alive = true;
+  const load = (ignoreClosed = false) =>
     api
       .get('/api/announcements')
-      .then((d) => {
-        if (!alive) return;
-        setItems((d.items ?? []).filter((a) => !isClosed(a)));
-      })
+      .then((d) => setItems((d.items ?? []).filter((a) => ignoreClosed || !isClosed(a))))
       .catch(() => {});
-    return () => {
-      alive = false;
+
+  useEffect(() => {
+    load();
+    // 后台「预览弹窗」按钮：不管有没有关过，直接弹出来看效果（关闭时不会记成"已读"）
+    const onPreview = () => {
+      setPreview(true);
+      load(true);
     };
+    window.addEventListener('zj:preview-anno', onPreview);
+    return () => window.removeEventListener('zj:preview-anno', onPreview);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const close = () => {
-    markClosed(items);
+    if (!preview) markClosed(items); // 预览模式下关闭，不记"已读"
+    setPreview(false);
     setItems([]);
   };
 

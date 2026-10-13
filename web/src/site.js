@@ -56,6 +56,11 @@ export const site = {
    * 然后把下面的 icon 改成 '/my-icon.png' 即可。
    */
   welcome: {
+    /* 开始界面什么时候出现：
+       'once'    = 只显示一次（默认）
+       'session' = 每个浏览器会话显示一次
+       'always'  = 每次打开/刷新都显示 */
+    show: 'once',
     icon: '/entry-icon.svg',
     title: 'zhoujiland',
     subtitle: '一个随便聊聊的小地方',

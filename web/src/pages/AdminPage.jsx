@@ -182,6 +182,13 @@ export default function AdminPage() {
           <button className="tiny" onClick={() => setAnnoForm(annoForm ? null : blankAnno())}>
             {annoForm ? site.announce.cancelNew : site.announce.newOne}
           </button>
+          <button
+            className="tiny"
+            title="像访客第一次进站那样弹一次看看"
+            onClick={() => window.dispatchEvent(new CustomEvent('zj:preview-anno'))}
+          >
+            预览弹窗
+          </button>
           {annos && (
             <span className="muted small">
               {site.announce.statusOn} {annos.filter((a) => a.active).length} 条 / 共 {annos.length} 条

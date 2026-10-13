@@ -3,8 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { site } from '../site.js';
 import { useAuth } from '../store.jsx';
 
-/** 进入过的标记：存在 localStorage，清理浏览器数据后会重新看到开始界面 */
-export const ENTERED_KEY = 'zj_entered';
+import { markEntered } from '../enter.js';
 
 /** 开始界面：图标 + 昵称 + 进入按钮 */
 export default function Welcome() {
@@ -27,7 +26,7 @@ export default function Welcome() {
   // 已经登录的人（换了新浏览器也会看到本页）直接放行，不用再起昵称
   useEffect(() => {
     if (user) {
-      localStorage.setItem(ENTERED_KEY, '1');
+      markEntered();
       navigate(from, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,7 +46,7 @@ export default function Welcome() {
       if (me?.actor?.type !== 'user') {
         await setGuestName(name);
       }
-      localStorage.setItem(ENTERED_KEY, '1');
+      markEntered();
       await refresh();
       notify(`欢迎，${name}`, 'ok');
       navigate(from, { replace: true });
@@ -91,7 +90,13 @@ export default function Welcome() {
         <p className="welcome-hint">{site.welcome.hint}</p>
 
         <div className="welcome-foot">
-          <button className="link" onClick={() => { localStorage.setItem(ENTERED_KEY, '1'); navigate(from, { replace: true }); }}>
+          <button
+            className="link"
+            onClick={() => {
+              markEntered();
+              navigate(from, { replace: true });
+            }}
+          >
             {site.welcome.back}
           </button>
           <span className="muted small">

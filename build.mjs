@@ -8,6 +8,20 @@ import { fileURLToPath } from 'node:url';
 import { build, createServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import { site } from './web/src/site.js';
+import { execSync } from 'node:child_process';
+
+/** 构建版本号：显示在页脚，用来判断浏览器跑的是哪一版（排查缓存问题特别有用） */
+function buildStamp() {
+  let sha = 'local';
+  try {
+    sha = execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  } catch {
+    /* 不是 git 仓库就算了 */
+  }
+  const t = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())} ${pad(t.getHours())}:${pad(t.getMinutes())} · ${sha}`;
+}
 
 /** 把 web/src/site.js 里的站点名与标语注入到 index.html（浏览器标签、分享卡片都用它） */
 const siteConfigPlugin = () => ({
@@ -25,6 +39,7 @@ const mode = process.argv[2] || 'build';
 const inlineConfig = {
   root: path.join(__dirname, 'web'),
   plugins: [react(), siteConfigPlugin()],
+  define: { __BUILD__: JSON.stringify(buildStamp()) },
   build: {
     outDir: path.join(__dirname, 'dist'),
     emptyOutDir: true,

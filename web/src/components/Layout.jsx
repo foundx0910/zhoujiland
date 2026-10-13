@@ -3,7 +3,7 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react
 import { useAuth } from '../store.jsx';
 import { site } from '../site.js';
 import Avatar from './Avatar.jsx';
-import { ENTERED_KEY } from '../pages/Welcome.jsx';
+import { hasEntered, resetEntered } from '../enter.js';
 import AnnouncementBanner from './AnnouncementBanner.jsx';
 import AnnouncementModal from './AnnouncementModal.jsx';
 
@@ -59,7 +59,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const entered = typeof localStorage !== 'undefined' && localStorage.getItem(ENTERED_KEY) === '1';
+  const entered = hasEntered();
 
   /**
    * 站内链接改成"新标签页打开"。
@@ -95,7 +95,7 @@ export default function Layout() {
     return () => document.removeEventListener('click', onClick);
   }, [location.pathname, location.search]);
 
-  // 第一次来访：先去开始界面（进去之后就不再拦了）
+  // 还没进过站：先去开始界面（显示频率由 site.js 的 welcome.show 决定）
   if (!entered) {
     return <Navigate to="/welcome" replace state={{ from: location }} />;
   }
@@ -213,7 +213,17 @@ export default function Layout() {
       <footer className="foot">
         <span>{site.name} · {site.tagline}</span>
         <span className="muted small">
-          <Link to="/announcements">{site.announce.navLabel}</Link> · {site.footerNote}
+          <Link to="/announcements">{site.announce.navLabel}</Link> ·{' '}
+          <button
+            className="btn-link"
+            onClick={() => {
+              resetEntered();
+              navigate('/welcome');
+            }}
+          >
+            重看进入界面
+          </button>{' '}
+          · {site.footerNote} · <span title="当前前端版本">v{typeof __BUILD__ === 'undefined' ? 'dev' : __BUILD__}</span>
         </span>
       </footer>
     </div>
