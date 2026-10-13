@@ -73,7 +73,14 @@ for (const [u, n] of [
 ]) {
   await u.post('/api/auth/register', { username: `${n}${stamp}`, password: 'secret123' });
 }
-await adm.post('/api/auth/login', { username: 'admin', password: 'admin123' });
+const adminLogin = await adm.post('/api/auth/login', { username: 'admin', password: 'admin123' });
+if (adminLogin.status !== 200) {
+  console.error(
+    '\n❌ 无法用 admin / admin123 登录。先跑 `npm run reset-db && npm run demo` 造出默认管理员，' +
+      '或确认没有别的套件把管理员密码改掉了（verify:core 结束时会还原）。\n',
+  );
+  process.exit(1);
+}
 
 const meA = await uA.get('/api/auth/me');
 const meB = await uB.get('/api/auth/me');
@@ -180,8 +187,9 @@ const idB = meB.body?.user?.id;
   check('匿名访客也能举报', (await guest('POST', '/api/reports', { targetType: 'post', targetId: post.id, reason: '垃圾刷屏' })).status === 201);
 
   const queue = await adm.get('/api/reports');
-  check('管理员能看到举报队列', queue.status === 200 && queue.body.items.length >= 2, `待处理 ${queue.body?.counts?.open}`);
-  check('队列带目标内容与板块', !!queue.body.items[0]?.board_name && 'target_excerpt' in queue.body.items[0]);
+  const queueItems = queue.body?.items ?? [];
+  check('管理员能看到举报队列', queue.status === 200 && queueItems.length >= 2, `待处理 ${queue.body?.counts?.open}`);
+  check('队列带目标内容与板块', !!queueItems[0]?.board_name && 'target_excerpt' in queueItems[0]);
   check('管理员可以处理举报', (await adm.post(`/api/reports/${rep.body.id}`, { action: 'resolve' })).status === 200);
 }
 

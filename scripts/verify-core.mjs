@@ -3,7 +3,14 @@ const BASE = process.argv[2] || process.env.FORUM_BASE || 'http://127.0.0.1:3000
 
 let pass = 0;
 let failed = 0;
+let skipped = 0;
 const results = [];
+
+/** 依赖数据库初始状态、当前跑不了的检查：记成「跳过」而不是误报失败 */
+function skip(name, why) {
+  skipped++;
+  results.push(`  ⏭ ${name} — 跳过：${why}`);
+}
 
 function check(name, ok, extra = '') {
   if (ok) {
@@ -217,15 +224,33 @@ const ghost = await alice.get('/api/threads/99999999');
 check('不存在的帖子返回 404', ghost.status === 404);
 
 /* ------------------------- 15. 默认密码标记 ------------------------- */
+// 这一节要求库是「刚播种」状态（admin 密码仍是 admin123、default_pw = 1）。
+// 已经不是的话跳过这几项——否则第二次运行必挂，还会因为 && 短路让 verify:features 整个不跑。
 const meAdmin = await admin.get('/api/auth/me');
-check('初始管理员带「默认密码」标记', meAdmin.body.user.default_pw === true);
-await admin.post('/api/auth/password', { oldPassword: 'admin123', newPassword: 'admin12345' });
-const afterPw = await admin.get('/api/auth/me');
-check('改过密码后标记清除', afterPw.body.user.default_pw === false);
-const relogin = await session('adm2').post('/api/auth/login', { username: 'admin', password: 'admin12345' });
-check('新密码可登录', relogin.status === 200);
-const oldPwLogin = await session('adm3').post('/api/auth/login', { username: 'admin', password: 'admin123' });
-check('旧密码已失效', oldPwLogin.status === 401);
+if (meAdmin.body.user.default_pw === true) {
+  check('初始管理员带「默认密码」标记', true);
+  await admin.post('/api/auth/password', { oldPassword: 'admin123', newPassword: 'admin12345' });
+  const afterPw = await admin.get('/api/auth/me');
+  check('改过密码后标记清除', afterPw.body.user.default_pw === false);
+  const relogin = await session('adm2').post('/api/auth/login', { username: 'admin', password: 'admin12345' });
+  check('新密码可登录', relogin.status === 200);
+  const oldPwLogin = await session('adm3').post('/api/auth/login', { username: 'admin', password: 'admin123' });
+  check('旧密码已失效', oldPwLogin.status === 401);
+  // 测完把初始密码还原：紧随其后的 verify:features 还要用 admin123 登录
+  await admin.post('/api/auth/password', { oldPassword: 'admin12345', newPassword: 'admin123' });
+  const restoreLogin = await session('adm4').post('/api/auth/login', { username: 'admin', password: 'admin123' });
+  check('密码已还原为 admin123（套件可重复运行）', restoreLogin.status === 200);
+} else {
+  const stillDefaultPw = await session('adm2').post('/api/auth/login', { username: 'admin', password: 'admin123' });
+  if (stillDefaultPw.status !== 200) {
+    console.error(
+      '\n❌ admin 既不是默认密码状态、也不是 admin123 —— 后续检查会全部 401。\n' +
+        '   先造一份干净数据：npm run reset-db && npm run demo\n',
+    );
+    process.exit(1);
+  }
+  skip('默认密码标记相关 5 项', '当前库已改过管理员密码，要跑这些需先 npm run reset-db && npm run demo');
+}
 
 /* ------------------------- 16. 最后一名管理员保护 ------------------------- */
 const selfDemote = await admin.post(`/api/admin/users/${meAdmin.body.user.id}`, { action: 'demote' });
@@ -269,6 +294,6 @@ check('不支持的板块操作被拒绝（400）', badAction.status === 400);
 const ghostBoard = await admin.post('/api/admin/boards/999999', { action: 'delete' });
 check('删除不存在的板块返回 404', ghostBoard.status === 404);
 
-console.log(`\n端到端验收结果：${pass} 通过 / ${failed} 失败\n`);
+console.log(`\n端到端验收结果：${pass} 通过 / ${failed} 失败${skipped ? ` / ${skipped} 跳过` : ''}\n`);
 console.log(results.join('\n'));
 process.exit(failed ? 1 : 0);
