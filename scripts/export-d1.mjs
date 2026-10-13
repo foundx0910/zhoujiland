@@ -25,6 +25,8 @@ const outFile = path.join(BACKUP_DIR, `forum-${stamp}.sql`);
 
 fs.mkdirSync(BACKUP_DIR, { recursive: true });
 
+console.log('⚠️  导出的 SQL 包含真实用户数据（含密码哈希），已被 .gitignore 忽略。');
+console.log('⚠️  千万不要把它提交到 git 仓库，尤其是公开仓库。');
 console.log('▶ 正在从线上 D1 导出数据（需要已登录 Cloudflare）…');
 const res = spawnSync(
   process.execPath,

@@ -200,6 +200,10 @@ Workers 免费版**每次请求只有 10ms CPU**，而密码哈希是纯 CPU 开
 
 ## 四、数据、备份与迁移
 
+> ⚠️ **纪律**：导出的数据文件（`backup/*.sql`）、数据库文件一律**不要提交到 git**。
+> 仓库里已经配了 `.gitignore` 规则和 `.githooks/pre-commit` 钩子来自动拦截；
+> 换机器后记得执行一次 `git config core.hooksPath .githooks` 启用钩子。
+
 - **Cloudflare**：`npx wrangler d1 export floor-forum --remote --output=backup.sql` 导出全部帖子数据；
   KV 里的图片用 `wrangler kv key list/get` 或控制台下载。恢复用 `wrangler d1 execute --remote --file=backup.sql`。
 - **本地**：直接拷 `data/forum.db`（连同 `data/uploads/`）。

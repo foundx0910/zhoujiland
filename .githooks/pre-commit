@@ -1,0 +1,10 @@
+#!/bin/sh
+# 防止把数据/备份文件提交进仓库（含用户数据，一旦推到公开仓库就是事故）
+bad=$(git diff --cached --name-only | grep -E '(^|/)backup/|\.sql$|\.db$|^data/|\.sqlite$' | grep -v '^worker/schema.sql$')
+if [ -n "$bad" ]; then
+  echo "❌ 提交被拦下：以下文件看起来包含数据，不应进仓库："
+  echo "$bad" | sed 's/^/   /'
+  echo "   如果确实要提交，请用 git commit --no-verify 跳过。"
+  exit 1
+fi
+exit 0

@@ -9,3 +9,11 @@ data/
 
 # 数据备份（含用户数据，绝不入库）
 backup/
+
+# 数据文件一律不入库（只放行建表用的 worker/schema.sql）
+*.sql
+!worker/schema.sql
+*.db
+*.sqlite
+*.db-wal
+*.db-shm
