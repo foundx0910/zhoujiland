@@ -7,6 +7,7 @@ import Editor from '../components/Editor.jsx';
 import Pagination from '../components/Pagination.jsx';
 import FloorCard from '../components/FloorCard.jsx';
 import ReportDialog from '../components/ReportDialog.jsx';
+import { askConfirm } from '../confirm.js';
 
 export default function ThreadPage() {
   const { id } = useParams();
@@ -98,16 +99,33 @@ export default function ThreadPage() {
   };
 
   const onDelete = async (post) => {
-    if (!confirm(post.floor_no ? `确定删除 ${post.floor_no} 楼吗？楼中楼回复会保留。` : '确定删除这条楼中楼回复吗？')) return;
-    await api.del(`/api/posts/${post.id}`);
-    notify('已删除', 'ok');
-    load(true);
+    const ok = await askConfirm({
+      title: post.floor_no ? `删除 ${post.floor_no} 楼` : '删除这条回复',
+      message: post.floor_no
+        ? `确定删除 ${post.floor_no} 楼吗？`
+        : '确定删除这条楼中楼回复吗？',
+      hint: post.floor_no ? '楼中楼回复会保留，楼层号会留一个占位。' : '',
+      confirmText: '删除',
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      await api.del(`/api/posts/${post.id}`);
+      notify('已删除', 'ok');
+      load(true);
+    } catch (e) {
+      notify(e.message || '删除失败，请稍后再试', 'error');
+    }
   };
 
   const onEdit = async (post, content) => {
-    await api.patch(`/api/posts/${post.id}`, { content });
-    notify('已保存修改', 'ok');
-    load(true);
+    try {
+      await api.patch(`/api/posts/${post.id}`, { content });
+      notify('已保存修改', 'ok');
+      load(true);
+    } catch (e) {
+      notify(e.message || '保存失败，请稍后再试', 'error');
+    }
   };
 
   const onReply = (post) => {
@@ -124,10 +142,21 @@ export default function ThreadPage() {
   };
 
   const deleteThread = async () => {
-    if (!confirm('确定删除整个帖子吗？')) return;
-    await api.del(`/api/threads/${id}`);
-    notify('帖子已删除', 'ok');
-    window.location.href = '/';
+    const ok = await askConfirm({
+      title: '删除整个帖子',
+      message: '确定删除整个帖子吗？',
+      hint: '帖子连同下面所有楼层都会消失（管理员仍可恢复）。',
+      confirmText: '删除本帖',
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      await api.del(`/api/threads/${id}`);
+      notify('帖子已删除', 'ok');
+      window.location.href = '/';
+    } catch (e) {
+      notify(e.message || '删除失败，请稍后再试', 'error');
+    }
   };
 
   if (error && !data) return <div className="error">{error}</div>;

@@ -4,6 +4,7 @@ import { api, fullTime, qs } from '../api.js';
 import { useAuth } from '../store.jsx';
 import Pagination from '../components/Pagination.jsx';
 import { site } from '../site.js';
+import { askConfirm } from '../confirm.js';
 
 export default function AdminPage() {
   const { isAdmin } = useAuth();
@@ -92,7 +93,14 @@ export default function AdminPage() {
   };
 
   const annoRemove = async (a) => {
-    if (!window.confirm(`删除公告「${a.title}」？删了就找不回来了`)) return;
+    const ok = await askConfirm({
+      title: '删除公告',
+      message: `删除公告「${a.title}」？`,
+      hint: '删了就找不回来了。',
+      confirmText: '删除',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       setError('');
       await api.del(`/api/announcements/${a.id}`);
@@ -128,12 +136,13 @@ export default function AdminPage() {
   const boardAction = async (board, action) => {
     if (action === 'delete') {
       const n = board.thread_count ?? 0;
-      const ok = confirm(
-        `确定删除板块「${board.name}」吗？\n\n` +
-          `· 板块会从首页隐藏，${n} 个帖子（含所有楼层）也一并隐藏\n` +
-          `· 数据不会真正删除，随时可以点「恢复」\n` +
-          `· 指向该板块的链接会变成 404`
-      );
+      const ok = await askConfirm({
+        title: '删除板块',
+        message: `确定删除板块「${board.name}」吗？`,
+        hint: `板块会从首页隐藏，${n} 个帖子（含所有楼层）也一并隐藏；数据不会真正删除，随时可以点「恢复」；指向该板块的链接会变成 404。`,
+        confirmText: '删除板块',
+        danger: true,
+      });
       if (!ok) return;
     }
     try {
@@ -147,9 +156,23 @@ export default function AdminPage() {
   };
 
   const userAction = async (user, action) => {
-    if (action === 'ban' && !confirm(`确定封禁「${user.username}」吗？其登录状态会立即失效。`)) return;
-    await api.post(`/api/admin/users/${user.id}`, { action });
-    loadOverview();
+    if (action === 'ban') {
+      const ok = await askConfirm({
+        title: '封禁用户',
+        message: `确定封禁「${user.username}」吗？`,
+        hint: '其登录状态会立即失效。',
+        confirmText: '封禁',
+        danger: true,
+      });
+      if (!ok) return;
+    }
+    try {
+      setError('');
+      await api.post(`/api/admin/users/${user.id}`, { action });
+      loadOverview();
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
   return (
@@ -531,10 +554,22 @@ export default function AdminPage() {
                     <button
                       className="tiny danger"
                       onClick={async () => {
-                        if (!confirm(`删除帖子「${t.title}」？`)) return;
-                        await api.del(`/api/threads/${t.id}`);
-                        loadThreads();
-                        loadOverview();
+                        const ok = await askConfirm({
+                          title: '删除帖子',
+                          message: `删除帖子「${t.title}」？`,
+                          hint: '删掉后可以在下方「已删除」里恢复。',
+                          confirmText: '删除',
+                          danger: true,
+                        });
+                        if (!ok) return;
+                        try {
+                          setError('');
+                          await api.del(`/api/threads/${t.id}`);
+                          loadThreads();
+                          loadOverview();
+                        } catch (e) {
+                          setError(e.message);
+                        }
                       }}
                     >
                       删除

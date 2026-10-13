@@ -218,6 +218,11 @@ p {
   color: #fff;
 }
 
+.flash.error {
+  background: var(--danger);
+  color: #fff;
+}
+
 /* ------------------------------ 布局 ------------------------------ */
 
 .main {
@@ -1794,4 +1799,15 @@ tr.row-deleted td {
 .anno-close-btn {
   min-width: 96px;
   justify-content: flex-end;
+}
+
+/* ------------------------------ 站内确认框 ------------------------------ */
+
+.confirm-modal {
+  max-width: 400px;
+}
+
+.confirm-message {
+  margin: 4px 0 0;
+  line-height: 1.6;
 }

@@ -4,6 +4,7 @@ import { useAuth } from '../store.jsx';
 import { site } from '../site.js';
 import Avatar from './Avatar.jsx';
 import { hasEntered, resetEntered } from '../enter.js';
+import ConfirmHost from './ConfirmDialog.jsx';
 import AnnouncementBanner from './AnnouncementBanner.jsx';
 import AnnouncementModal from './AnnouncementModal.jsx';
 
@@ -202,6 +203,8 @@ export default function Layout() {
           {flash.message}
         </div>
       )}
+
+      <ConfirmHost />
 
       {site.announce.style !== 'modal' && <AnnouncementBanner />}
       {site.announce.style !== 'banner' && <AnnouncementModal />}
