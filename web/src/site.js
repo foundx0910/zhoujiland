@@ -16,6 +16,9 @@
 export const site = {
   /* ------------------------------ 站点名称 ------------------------------ */
   name: 'zhoujiland',
+
+  /** 站内链接是否都用「新标签页」打开（true = 点了新开一个页面；false = 原地跳转） */
+  linksOpenInNewTab: true,
   tagline: '一块自己搭的小地方，随便聊聊',
   footerNote: '帖子存在 Cloudflare D1，图片存在 KV',
 
@@ -45,6 +48,24 @@ export const site = {
       text: '#ece7e0',
       muted: '#a8a096',
     },
+  },
+
+  /* ---------------------------- 开始界面 ----------------------------
+   * 一进站先看到这个界面：图标 + 昵称 + 进入按钮。
+   * 换成自己的图标：把图片放进 web/public/（比如 my-icon.png），
+   * 然后把下面的 icon 改成 '/my-icon.png' 即可。
+   */
+  welcome: {
+    icon: '/entry-icon.svg',
+    title: 'zhoujiland',
+    subtitle: '一个随便聊聊的小地方',
+    nicknameLabel: '先起个昵称吧',
+    nicknamePlaceholder: '2-20 个字，中英文都行',
+    button: '进入',
+    hint: '昵称只存在你自己的浏览器里，不用注册也能发帖。',
+    hasAccount: '已经有账号？',
+    login: '去登录',
+    back: '先去逛逛',
   },
 
   /* ---------------------------- 顶栏与导航 ---------------------------- */

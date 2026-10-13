@@ -4,6 +4,7 @@ import Layout from './components/Layout.jsx';
 import Boards from './pages/Boards.jsx';
 import BoardPage from './pages/BoardPage.jsx';
 import ThreadPage from './pages/ThreadPage.jsx';
+import Welcome from './pages/Welcome.jsx';
 
 // 不常用 / 次要页面按需加载，首屏只需要核心那几个
 const SearchPage = lazy(() => import('./pages/SearchPage.jsx'));
@@ -20,6 +21,8 @@ export default function App() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
+        {/* 开始界面：独立全屏，不在论坛布局里 */}
+        <Route path="/welcome" element={<Welcome />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Boards />} />
           <Route path="/b/:slug" element={<BoardPage />} />

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store.jsx';
 import { site } from '../site.js';
 import Avatar from './Avatar.jsx';
+import { ENTERED_KEY } from '../pages/Welcome.jsx';
 
 function IdentityBar() {
   const { actor, setGuestName, notify } = useAuth();
@@ -54,6 +55,48 @@ export default function Layout() {
   const { actor, user, isAdmin, unread, pendingReports, logout, flash, dismissFlash } = useAuth();
   const [q, setQ] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const entered = typeof localStorage !== 'undefined' && localStorage.getItem(ENTERED_KEY) === '1';
+
+  /**
+   * 站内链接改成"新标签页打开"。
+   * 这里用全局事件代理，所以帖子正文里的 Markdown 链接也一并生效。
+   * 想关掉：把 site.js 里的 linksOpenInNewTab 改成 false。
+   * 个别链接想原地跳转：给它加 data-no-new-tab="true"。
+   */
+  useEffect(() => {
+    if (!site.linksOpenInNewTab) return undefined;
+    const onClick = (e) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // 用户自己想开新标签
+      const a = e.target?.closest?.('a');
+      if (!a || a.target || a.hasAttribute('download')) return;
+      if (a.dataset.noNewTab === 'true') return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#')) return;
+
+      let url;
+      try {
+        url = new URL(a.href, location.href);
+      } catch {
+        return;
+      }
+      if (url.origin !== location.origin) return; // 外链按原样处理
+      // 同一页面的锚点（比如跳到 #floor-3）就交给浏览器滚动
+      if (url.pathname === location.pathname && url.search === location.search) return;
+
+      e.preventDefault();
+      window.open(url.href, '_blank', 'noopener');
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, [location.pathname, location.search]);
+
+  // 第一次来访：先去开始界面（进去之后就不再拦了）
+  if (!entered) {
+    return <Navigate to="/welcome" replace state={{ from: location }} />;
+  }
 
   const search = (e) => {
     e.preventDefault();
