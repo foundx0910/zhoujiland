@@ -347,6 +347,12 @@ button {
   padding: 7px 13px;
 }
 
+button {
+  /* 手机端：去掉双击缩放带来的点击延迟，并给一点点击反馈 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.07);
+}
+
 button:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
@@ -1092,6 +1098,32 @@ tr.row-deleted td {
 
   .thread-stats {
     min-width: 76px;
+  }
+
+  /* 手机端：楼层下方的操作按钮做大，避免点不中 */
+  .actions {
+    gap: 8px 12px;
+  }
+
+  .actions button {
+    padding: 7px 10px;
+    font-size: 14px;
+    min-height: 38px;
+  }
+
+  .actions.small button {
+    padding: 6px 9px;
+    font-size: 13px;
+    min-height: 34px;
+  }
+
+  /* 确认框的按钮在手机上占满一行，方便点 */
+  .modal-foot button {
+    min-height: 42px;
+  }
+
+  .confirm-modal .modal-foot button {
+    flex: 1;
   }
 }
 

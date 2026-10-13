@@ -37,7 +37,7 @@ export default function ConfirmHost() {
     resolve(ok);
   }
 
-  const t = site.confirm;
+  const t = site.confirm ?? {};
 
   return (
     <div className="modal-mask" onClick={() => done(false)}>
