@@ -1,0 +1,43 @@
+#:schema node_modules/wrangler/config-schema.json
+#
+# Cloudflare Workers 部署配置
+# 部署步骤见 README「部署到 Cloudflare」一节；两个 REPLACE_WITH_... 需要替换成你自己的 ID。
+
+name = "floor-forum"
+main = "worker/index.js"
+compatibility_date = "2026-09-01"
+
+# 保留 workers.dev 作为备用入口（国内需 VPN）：万一免费域名出问题还能进去管理
+workers_dev = true
+
+# 自定义域名：部署时自动把论坛绑到这个域名（国内不用 VPN 也能访问）
+routes = [
+  { pattern = "zhoujiland.dpdns.org", custom_domain = true }
+]
+
+# 关掉预览 URL：预览地址是公开可访问的版本副本，关掉更稳妥
+preview_urls = false
+
+# 前端静态资源（npm run build 产物）
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "none"
+
+# D1 数据库：npm run cf:create-db 之后把输出的 database_id 填到这里
+[[d1_databases]]
+binding = "DB"
+database_name = "floor-forum"
+database_id = "c89200f1-4014-441f-a363-ba090d760cd9"  # ← 部署前替换为 npm run cf:create-db 输出的 database_id
+
+# 图片存储：npm run cf:create-kv 之后把输出的 id 填到这里
+[[kv_namespaces]]
+binding = "UPLOADS"
+id = "d700c7829af6460a8997e3e529020e62"  # ← 部署前替换为 npm run cf:create-kv 输出的 id
+
+[observability]
+enabled = true
+
+# 排障开关：设为 "1" 时 500 响应会带上真实异常信息（稳定后可删掉这段）
+[vars]
+FORUM_DEBUG = "0"   # 排障时改成 "1"，500 响应会带上真实异常

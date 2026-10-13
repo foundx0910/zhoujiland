@@ -1,0 +1,37 @@
+{
+  "name": "floor-forum",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "楼层式论坛：板块 + 帖子 + 一层一层的评论（含楼中楼）。本地 Node + SQLite，线上 Cloudflare Workers + D1",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning server/index.js",
+    "build": "node build.mjs build",
+    "dev:web": "node build.mjs dev",
+    "demo": "node --disable-warning=ExperimentalWarning scripts/demo.mjs",
+    "reset-db": "node scripts/reset.mjs",
+    "gen:schema": "node scripts/gen-schema.mjs",
+    "cf:dev": "npm run build && wrangler dev",
+    "cf:create-db": "wrangler d1 create floor-forum",
+    "cf:create-kv": "wrangler kv namespace create UPLOADS",
+    "cf:init-db": "node scripts/gen-schema.mjs && wrangler d1 execute floor-forum --file=worker/schema.sql --remote",
+    "cf:deploy": "npm run build && wrangler deploy",
+    "cf:tail": "wrangler tail"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.7",
+    "marked": "^15.0.12",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^7.1.9",
+    "wrangler": "^4.149.0"
+  }
+}
