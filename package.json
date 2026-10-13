@@ -20,7 +20,9 @@
     "cf:create-kv": "wrangler kv namespace create UPLOADS",
     "cf:init-db": "node scripts/gen-schema.mjs && wrangler d1 execute floor-forum --file=worker/schema.sql --remote",
     "cf:deploy": "npm run build && wrangler deploy",
-    "cf:tail": "wrangler tail"
+    "cf:tail": "wrangler tail",
+    "export-db": "node scripts/export-d1.mjs",
+    "export-db:import": "node scripts/export-d1.mjs --import"
   },
   "dependencies": {
     "dompurify": "^3.2.7",

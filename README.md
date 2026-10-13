@@ -203,6 +203,8 @@ Workers 免费版**每次请求只有 10ms CPU**，而密码哈希是纯 CPU 开
 - **Cloudflare**：`npx wrangler d1 export floor-forum --remote --output=backup.sql` 导出全部帖子数据；
   KV 里的图片用 `wrangler kv key list/get` 或控制台下载。恢复用 `wrangler d1 execute --remote --file=backup.sql`。
 - **本地**：直接拷 `data/forum.db`（连同 `data/uploads/`）。
+- **线上 → 本地 / 自己的服务器**：`npm run export-db`（导出线上 D1 到 `backup/*.sql`），
+  加 `--import` 会顺便灌进本地 `data/forum.db`：`npm run export-db:import`。搬去 VPS 时连 `data/uploads/` 一起拷。
 - **本地 → 线上**：先在本地 `npx wrangler d1 export`（或直接把 `data/forum.db` 用 `sqlite3 .dump` 导出成 SQL），
   再 `npx wrangler d1 execute floor-forum --remote --file=你的备份.sql`。
 
