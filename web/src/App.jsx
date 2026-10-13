@@ -12,6 +12,7 @@ const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
 const MePage = lazy(() => import('./pages/MePage.jsx'));
 const UserPage = lazy(() => import('./pages/UserPage.jsx'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage.jsx'));
+const AnnouncementsPage = lazy(() => import('./pages/AnnouncementsPage.jsx'));
 const LoginPage = lazy(() => import('./pages/AuthPages.jsx').then((m) => ({ default: m.Login })));
 const RegisterPage = lazy(() => import('./pages/AuthPages.jsx').then((m) => ({ default: m.Register })));
 
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/me" element={<MePage />} />
           <Route path="/u/:id" element={<UserPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

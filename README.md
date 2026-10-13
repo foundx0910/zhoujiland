@@ -238,6 +238,7 @@ Workers 免费版**每次请求只有 10ms CPU**，而密码哈希是纯 CPU 开
 - **消息通知**：别人回复你的帖子 / 回复你的楼层 / 点赞 / `@你` 时，会在顶栏铃铛亮起未读数；通知中心可翻页、一键已读。只发给注册用户（游客没有账号）。同一次操作里同一人只收一条，且 `@提及` 优先于「帖子里有人回复」。
 - **版主**：管理员可以为每个板块任命/撤销版主。版主能置顶、锁定、删除本板块的帖子与楼层，并处理本板块的举报；管不到别的板块。
 - **举报**：楼层和主题都能举报（6 种常见理由 + 补充说明），同一个人对同一目标只留一条未处理记录；管理员看全部队列，版主只看自己板块。
+- **站内公告**：管理员在后台发布/编辑/下架，前台顶部横幅显示（重要级更醒目），可展开看 Markdown 正文、可点 ✕ 不再显示这一条；`/announcements` 能看到历史公告（含已下架的）。下架即"取消发布"，删除即彻底移除。
 - **管理后台** `/admin`：数据总览、**举报处理队列**、**板块与版主任命**、删除/恢复板块、用户封禁/解封、设为/取消管理员、删除/恢复帖子与楼层。
 
 ### 身份与权限
@@ -344,6 +345,11 @@ npm run cf:tail        # 看线上日志
 | POST | `/api/reports` | 举报楼层/主题（`targetType`、`targetId`、`reason`、`detail`） |
 | GET | `/api/reports` | 举报处理队列（管理员全部 / 版主本板块，`status`） |
 | POST | `/api/reports/:id` | 处理举报（`action` = `resolve` \| `reject`） |
+| GET | `/api/announcements` | 公告列表（默认只给生效中的；`?history=1` 含已下架） |
+| GET | `/api/announcements/all` | 后台：全部公告（管理员） |
+| POST | `/api/announcements` | 发布公告（管理员） |
+| PATCH | `/api/announcements/:id` | 编辑 / 上架 / 下架（管理员，只传要改的字段） |
+| DELETE | `/api/announcements/:id` | 删除公告（管理员） |
 | POST | `/api/admin/boards/:id/moderators` | 任命/撤销版主（`action` = `add` \| `remove`、`userId`） |
 | PATCH | `/api/auth/profile` | 修改个人资料（`bio` 签名、`avatar` 头像，仅登录用户） |
 | POST | `/api/upload` | 上传图片：**请求体是图片原始字节**，`Content-Type: image/*` |

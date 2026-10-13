@@ -460,6 +460,68 @@ export async function adminThreads(db, { page, size, offset }) {
   return { rows, total };
 }
 
+/* -------------------------------- 公告 -------------------------------- */
+
+const ANNO_COLS = 'id, title, content, level, link_url, link_text, active, sort, created_by, created_at, updated_at';
+
+/** 前台横幅：只取已启用的 */
+export const listActiveAnnouncements = (db) =>
+  db.all(`SELECT ${ANNO_COLS} FROM announcements WHERE active = 1 ORDER BY sort DESC, id DESC`);
+
+/** 后台列表：全部（含已下架的） */
+export const listAllAnnouncements = (db) =>
+  db.all(`SELECT ${ANNO_COLS} FROM announcements ORDER BY active DESC, sort DESC, id DESC`);
+
+export const getAnnouncement = (db, id) =>
+  db.first(`SELECT ${ANNO_COLS} FROM announcements WHERE id = ?`, [id]);
+
+export async function createAnnouncement(db, a) {
+  const t = now();
+  const res = await db.run(
+    `INSERT INTO announcements (title, content, level, link_url, link_text, active, sort, created_by, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      a.title,
+      a.content ?? '',
+      a.level ?? 'normal',
+      a.linkUrl ?? '',
+      a.linkText ?? '',
+      a.active ? 1 : 0,
+      a.sort ?? 0,
+      a.createdBy ?? '',
+      t,
+      t,
+    ]
+  );
+  return { id: res.lastInsertRowid };
+}
+
+export async function updateAnnouncement(db, id, a) {
+  const fields = [];
+  const params = [];
+  const map = {
+    title: 'title',
+    content: 'content',
+    level: 'level',
+    linkUrl: 'link_url',
+    linkText: 'link_text',
+    active: 'active',
+    sort: 'sort',
+  };
+  for (const [key, col] of Object.entries(map)) {
+    if (a[key] !== undefined) {
+      fields.push(`${col} = ?`);
+      params.push(key === 'active' ? (a[key] ? 1 : 0) : a[key]);
+    }
+  }
+  if (!fields.length) return;
+  fields.push('updated_at = ?');
+  params.push(now(), id);
+  await db.run(`UPDATE announcements SET ${fields.join(', ')} WHERE id = ?`, params);
+}
+
+export const deleteAnnouncement = (db, id) => db.run('DELETE FROM announcements WHERE id = ?', [id]);
+
 /* ------------------------------ 消息通知 ------------------------------ */
 
 export async function listNotifications(db, userId, { size, offset }) {
@@ -715,7 +777,7 @@ export async function myContent(db, actorKey) {
 let bootstrapped = false;
 
 /** 数据结构版本：以后加表/加列时把这个数字 +1，老库会自动重新走一遍升级 */
-export const SCHEMA_VERSION = '4';
+export const SCHEMA_VERSION = '5';
 
 /** 把建表 SQL 拆成单条语句（D1 的 exec 不支持多行 DDL，batch 才可靠） */
 export const splitStatements = (sql) =>

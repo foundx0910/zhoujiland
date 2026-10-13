@@ -1629,3 +1629,109 @@ tr.row-deleted td {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* ------------------------------ 公告 ------------------------------ */
+
+.anno-wrap {
+  max-width: 1080px;
+  margin: 12px auto 0;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.anno {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.anno-important {
+  border-left-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 7%, var(--bg-elevated));
+}
+
+.anno-icon {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.anno-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.anno-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.anno-content {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.anno-close {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.anno-close:hover {
+  color: var(--danger);
+  background: none;
+}
+
+.anno-foot {
+  text-align: right;
+  font-size: 13px;
+}
+
+.anno-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.anno-item h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.anno-item.past {
+  opacity: 0.72;
+}
+
+.anno-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+
+.anno-form label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.anno-form input,
+.anno-form textarea {
+  width: 100%;
+}

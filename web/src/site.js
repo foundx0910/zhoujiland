@@ -79,6 +79,43 @@ export const site = {
     logout: '退出',
   },
 
+  /* ------------------------------ 公告 ------------------------------ */
+  announce: {
+    navLabel: '公告',
+    all: '查看全部公告 →',
+    expand: '展开',
+    collapse: '收起',
+    dismiss: '不再显示这条',
+    more: '查看详情',
+    levelNormal: '普通',
+    levelImportant: '重要',
+    past: '已结束',
+    none: '暂时没有公告。',
+    /* 后台管理面板 */
+    sectionTitle: '公告',
+    newOne: '＋ 发公告',
+    cancelNew: '先算了',
+    editTitle: '编辑公告',
+    newTitle: '发一条公告',
+    titleLabel: '标题',
+    titlePlaceholder: '例如：本周六凌晨维护，可能短暂打不开',
+    contentLabel: '正文（支持 Markdown）',
+    contentPlaceholder: '想让大家都知道的事，写在这里…',
+    levelLabel: '级别',
+    linkLabel: '附带链接（可选）',
+    linkPlaceholder: 'https://… 或 /t/12',
+    linkTextLabel: '链接文字（可选）',
+    sortLabel: '排序权重（越大越靠前）',
+    activeLabel: '立即发布（取消勾选 = 先存着不显示）',
+    save: '保存',
+    publish: '上架',
+    unpublish: '下架',
+    remove: '删除',
+    empty: '还没有公告。想让大家都知道的事，写在这里。',
+    statusOn: '生效中',
+    statusOff: '已下架',
+  },
+
   /* ------------------------------ 各处文案 ------------------------------ */
   text: {
     /* 游客提示条 */

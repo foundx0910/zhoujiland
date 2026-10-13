@@ -118,6 +118,23 @@ CREATE TABLE IF NOT EXISTS board_moderators (
 
 CREATE INDEX IF NOT EXISTS idx_mod_user ON board_moderators (user_id);
 
+-- 站内公告（管理员发布，前台顶部横幅 + /announcements 历史页）
+CREATE TABLE IF NOT EXISTS announcements (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  title      TEXT NOT NULL,
+  content    TEXT NOT NULL DEFAULT '',
+  level      TEXT NOT NULL DEFAULT 'normal',
+  link_url   TEXT NOT NULL DEFAULT '',
+  link_text  TEXT NOT NULL DEFAULT '',
+  active     INTEGER NOT NULL DEFAULT 1,
+  sort       INTEGER NOT NULL DEFAULT 0,
+  created_by TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_anno_active ON announcements (active, sort DESC, id DESC);
+
 -- 举报
 CREATE TABLE IF NOT EXISTS reports (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,

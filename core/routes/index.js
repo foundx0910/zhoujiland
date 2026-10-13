@@ -8,6 +8,7 @@ import { register as upload } from './upload.js';
 import { register as users } from './users.js';
 import { register as notifications } from './notifications.js';
 import { register as reports } from './reports.js';
+import { register as announcements } from './announcements.js';
 
 export function registerRoutes(router) {
   auth(router);
@@ -19,5 +20,6 @@ export function registerRoutes(router) {
   users(router);
   notifications(router);
   reports(router);
+  announcements(router);
   upload(router);
 }

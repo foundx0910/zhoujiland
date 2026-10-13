@@ -4,6 +4,7 @@ import { useAuth } from '../store.jsx';
 import { site } from '../site.js';
 import Avatar from './Avatar.jsx';
 import { ENTERED_KEY } from '../pages/Welcome.jsx';
+import AnnouncementBanner from './AnnouncementBanner.jsx';
 
 function IdentityBar() {
   const { actor, setGuestName, notify } = useAuth();
@@ -201,13 +202,17 @@ export default function Layout() {
         </div>
       )}
 
+      <AnnouncementBanner />
+
       <main className="main">
         <Outlet />
       </main>
 
       <footer className="foot">
         <span>{site.name} · {site.tagline}</span>
-        <span className="muted small">{site.footerNote}</span>
+        <span className="muted small">
+          <Link to="/announcements">{site.announce.navLabel}</Link> · {site.footerNote}
+        </span>
       </footer>
     </div>
   );

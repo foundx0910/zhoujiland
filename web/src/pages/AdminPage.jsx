@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api, fullTime, qs } from '../api.js';
 import { useAuth } from '../store.jsx';
 import Pagination from '../components/Pagination.jsx';
+import { site } from '../site.js';
 
 export default function AdminPage() {
   const { isAdmin } = useAuth();
@@ -12,12 +13,16 @@ export default function AdminPage() {
   const [reports, setReports] = useState(null);
   const [reportStatus, setReportStatus] = useState('open');
   const [modPick, setModPick] = useState({});
+  const [annos, setAnnos] = useState(null);
+  const [annoForm, setAnnoForm] = useState(null);
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
 
   const loadOverview = () => api.get('/api/admin/overview').then(setOverview).catch((e) => setError(e.message));
   const loadThreads = () => api.get(`/api/admin/threads${qs({ page })}`).then(setThreads).catch((e) => setError(e.message));
   const loadBoards = () => api.get('/api/admin/boards').then((d) => setBoards(d.boards)).catch((e) => setError(e.message));
+  const loadAnnos = () =>
+    api.get('/api/announcements/all').then((d) => setAnnos(d.items)).catch((e) => setError(e.message));
   const loadReports = () =>
     api
       .get(`/api/reports${qs({ status: reportStatus })}`)
@@ -36,6 +41,9 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAdmin) loadReports();
   }, [isAdmin, reportStatus]);
+  useEffect(() => {
+    if (isAdmin) loadAnnos();
+  }, [isAdmin]);
 
   if (!isAdmin) {
     return (
@@ -48,6 +56,51 @@ export default function AdminPage() {
       </div>
     );
   }
+
+  const blankAnno = () => ({
+    id: null,
+    title: '',
+    content: '',
+    level: 'normal',
+    linkUrl: '',
+    linkText: '',
+    sort: 0,
+    active: true,
+  });
+
+  const saveAnno = async () => {
+    try {
+      setError('');
+      const { id, ...data } = annoForm;
+      if (id) await api.patch(`/api/announcements/${id}`, data);
+      else await api.post('/api/announcements', data);
+      setAnnoForm(null);
+      loadAnnos();
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const annoAction = async (a, patch) => {
+    try {
+      setError('');
+      await api.patch(`/api/announcements/${a.id}`, patch);
+      loadAnnos();
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const annoRemove = async (a) => {
+    if (!window.confirm(`删除公告「${a.title}」？删了就找不回来了`)) return;
+    try {
+      setError('');
+      await api.del(`/api/announcements/${a.id}`);
+      loadAnnos();
+    } catch (e) {
+      setError(e.message);
+    }
+  };
 
   const handleReport = async (report, action) => {
     try {
@@ -122,6 +175,118 @@ export default function AdminPage() {
           ))}
         </div>
       )}
+
+      <h2>{site.announce.sectionTitle}</h2>
+      <div className="card">
+        <div className="row gap" style={{ marginBottom: 10 }}>
+          <button className="tiny" onClick={() => setAnnoForm(annoForm ? null : blankAnno())}>
+            {annoForm ? site.announce.cancelNew : site.announce.newOne}
+          </button>
+          {annos && (
+            <span className="muted small">
+              {site.announce.statusOn} {annos.filter((a) => a.active).length} 条 / 共 {annos.length} 条
+            </span>
+          )}
+        </div>
+
+        {annoForm && (
+          <div className="anno-form">
+            <label>{site.announce.titleLabel}</label>
+            <input
+              value={annoForm.title}
+              maxLength={60}
+              placeholder={site.announce.titlePlaceholder}
+              onChange={(e) => setAnnoForm({ ...annoForm, title: e.target.value })}
+            />
+
+            <label>{site.announce.contentLabel}</label>
+            <textarea
+              rows={5}
+              value={annoForm.content}
+              placeholder={site.announce.contentPlaceholder}
+              onChange={(e) => setAnnoForm({ ...annoForm, content: e.target.value })}
+            />
+
+            <div className="row gap wrap">
+              <label className="row gap">
+                {site.announce.levelLabel}
+                <select value={annoForm.level} onChange={(e) => setAnnoForm({ ...annoForm, level: e.target.value })}>
+                  <option value="normal">{site.announce.levelNormal}</option>
+                  <option value="important">{site.announce.levelImportant}</option>
+                </select>
+              </label>
+              <label className="row gap">
+                {site.announce.sortLabel}
+                <input
+                  type="number"
+                  style={{ width: 80 }}
+                  value={annoForm.sort}
+                  onChange={(e) => setAnnoForm({ ...annoForm, sort: e.target.value })}
+                />
+              </label>
+              <label className="row gap">
+                <input
+                  type="checkbox"
+                  checked={annoForm.active}
+                  onChange={(e) => setAnnoForm({ ...annoForm, active: e.target.checked })}
+                />
+                {site.announce.activeLabel}
+              </label>
+            </div>
+
+            <div className="row gap wrap">
+              <input
+                value={annoForm.linkUrl}
+                placeholder={site.announce.linkPlaceholder}
+                onChange={(e) => setAnnoForm({ ...annoForm, linkUrl: e.target.value })}
+              />
+              <input
+                style={{ maxWidth: 160 }}
+                value={annoForm.linkText}
+                placeholder={site.announce.linkTextLabel}
+                onChange={(e) => setAnnoForm({ ...annoForm, linkText: e.target.value })}
+              />
+            </div>
+
+            <div className="row gap end">
+              <button onClick={() => setAnnoForm(null)}>取消</button>
+              <button className="primary" onClick={saveAnno}>
+                {site.announce.save}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {annos && annos.length === 0 && <div className="muted">{site.announce.empty}</div>}
+
+        <ul className="report-list">
+          {(annos ?? []).map((a) => (
+            <li key={a.id} className={a.active ? '' : 'status-rejected'}>
+              <div className="row gap wrap">
+                <strong>{a.title}</strong>
+                {a.level === 'important' && <span className="tag lock">{site.announce.levelImportant}</span>}
+                <span className="tag">{a.active ? site.announce.statusOn : site.announce.statusOff}</span>
+                <span className="muted small">
+                  {a.created_by ? `${a.created_by} · ` : ''}
+                  {fullTime(a.updated_at)}
+                </span>
+              </div>
+              {a.content && <div className="muted small">“{a.content.slice(0, 70)}”</div>}
+              <div className="row gap">
+                <button className="tiny" onClick={() => setAnnoForm({ ...a })}>
+                  编辑
+                </button>
+                <button className="tiny" onClick={() => annoAction(a, { active: !a.active })}>
+                  {a.active ? site.announce.unpublish : site.announce.publish}
+                </button>
+                <button className="tiny danger" onClick={() => annoRemove(a)}>
+                  {site.announce.remove}
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <h2>
         举报处理
