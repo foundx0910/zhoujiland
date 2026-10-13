@@ -19,7 +19,7 @@ export const site = {
 
   /** 站内链接是否都用「新标签页」打开（true = 点了新开一个页面；false = 原地跳转） */
   linksOpenInNewTab: true,
-  tagline: '一块自己搭的小地方，随便聊聊',
+  tagline: 'zhoujiland的6b啊，随便聊聊',
   footerNote: '帖子存在 Cloudflare D1，图片存在 KV',
 
   /* -------------------------------- 配色 --------------------------------
@@ -63,7 +63,7 @@ export const site = {
     show: 'once',
     icon: '/entry-icon.svg',
     title: 'zhoujiland',
-    subtitle: '一个随便聊聊的小地方',
+    subtitle: 'zhoujiland讨论室',
     nicknameLabel: '先起个昵称吧',
     nicknamePlaceholder: '2-20 个字，中英文都行',
     button: '进入',
@@ -89,7 +89,7 @@ export const site = {
     /* 公告怎么显示：'modal' = 进站弹窗（默认）、'banner' = 顶部横幅、'both' = 两个都要 */
     style: 'modal',
     modalTitle: '公告',
-    close: '知道了',
+    close: 'xiodeibano',
     navLabel: '公告',
     all: '查看全部公告 →',
     expand: '展开',
